@@ -1,0 +1,32 @@
+name: scheduled_scraping
+
+on:
+  schedule:
+    - cron: "0 3 * * *"   # daily 03:00 UTC
+  workflow_dispatch:      # allows manual run from the Actions tab
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"          # pip cache support
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run script
+        run: python run_pipeline.py
+        # env:
+        #   # example: pass secrets here
+        #   MY_API_KEY: ${{ secrets.MY_API_KEY }}
+        #   DB_URL: ${{ secrets.DB_URL }}
