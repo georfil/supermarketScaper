@@ -56,6 +56,11 @@ def fetch_products(category_code, page):
     }
 
     response = requests.get(url, headers=HEADERS, params=params)
+
+    print("AB status:", response.status_code)
+    
+    print("AB response:", response.text)
+
     return response.json()
 
 
@@ -67,6 +72,7 @@ def scrape():
         category_code = category_url.split("c/")[1]
         first_page = fetch_products(category_code, 0)
 
+        
         pagination = first_page["data"]["categoryProductSearch"]["pagination"]
         total_pages = pagination["totalPages"]
 
