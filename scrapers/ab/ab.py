@@ -19,7 +19,6 @@ HEADERS = {
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-origin",
     "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36",
-
 }
 
 
@@ -28,9 +27,12 @@ def fetch_categories():
     html = requests.get(url, headers=HEADERS).text
     soup = BeautifulSoup(html, "html.parser")
 
+    navbar = soup.find("ul", attrs={"data-testid":"category-carousel-list"})
+
+
     return [
         "https://www.ab.gr/" + a["href"]
-        for a in soup.find_all("a")
+        for a in navbar.find_all("a")
         if "/c/" in a.get("href", "")
     ]
 
