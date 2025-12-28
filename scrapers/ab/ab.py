@@ -57,19 +57,16 @@ def fetch_products(category_code, page):
 
     response = requests.get(url, headers=HEADERS, params=params)
 
-    print("AB status:", response.status_code)
-    
-    print("AB response:", response.text)
-
     return response.json()
 
 
 def scrape():
     products = []
     categories = fetch_categories()
-
+    print(categories)
     for category_url in categories:
         category_code = category_url.split("c/")[1]
+        print(category_code)
         first_page = fetch_products(category_code, 0)
 
         
