@@ -66,9 +66,8 @@ def fetch_products(category_code, page):
 def scrape():
     products = []
     categories = fetch_categories()
-    print(categories)
     for category_url in categories:
-        sleep(1)
+        sleep(2)
         category_code = category_url.split("c/")[1]
         print(category_code)
         first_page = fetch_products(category_code, 0)
