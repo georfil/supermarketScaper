@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+from time import sleep
 
 
 HEADERS = {
@@ -67,6 +68,7 @@ def scrape():
     categories = fetch_categories()
     print(categories)
     for category_url in categories:
+        sleep(1)
         category_code = category_url.split("c/")[1]
         print(category_code)
         first_page = fetch_products(category_code, 0)

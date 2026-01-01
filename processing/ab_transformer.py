@@ -2,6 +2,9 @@
 
 import pandas as pd
 import numpy as np
+import datetime as dt
+
+TODAY = dt.date.today().strftime("%d-%m-%Y")
 
 
 PRIVATE_LABELS = {
@@ -41,6 +44,7 @@ def transform(raw_products):
     )
 
     df["privateLabel"] = df["brand"].isin(PRIVATE_LABELS)
+    df['date'] = TODAY
 
     return df[
         [
@@ -54,5 +58,6 @@ def transform(raw_products):
             "image",
             "supermarket",
             "privateLabel",
+            "date",
         ]
     ]
