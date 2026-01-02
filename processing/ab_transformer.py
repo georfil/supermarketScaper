@@ -3,6 +3,9 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
+import json 
+import requests
+from scrapers.ab.ab import HEADERS
 
 TODAY = dt.date.today().strftime("%d-%m-%Y")
 
@@ -19,12 +22,45 @@ PRIVATE_LABELS = {
 }
 
 
+def fetchUniqueCategories():
+    url = "https://www.ab.gr/api/v1/"
+
+    params = {
+        "operationName": "LeftHandNavigationBar",
+        "variables": json.dumps({"rootCategoryCode":"","cutOffLevel":"4","lang":"gr"}, separators=(',', ':')),
+        "extensions": json.dumps(
+        {"persistedQuery":{"version":1,"sha256Hash":"29a05b50daa7ab7686d28bf2340457e2a31e1a9e4d79db611fcee435536ee01c"}}
+        , separators=(',', ':'))
+    }
+
+    response = requests.request("GET", url, headers=HEADERS, params=params)
+    return response.json()
+
+
+def getCategoryMappings():
+    data = fetchUniqueCategories()['data']['leftHandNavigationBar']['categoryTreeList']
+    cat_mappings = {}
+    for lvl in data:
+        cats = lvl['categoriesInfo']
+        for cat in cats:
+            for sub in cat['levelInfo']:
+                cat_mappings.update({sub['url'].split('/c')[0].split('/')[-1]:sub['name']})
+    return cat_mappings
+
+
 def transform(raw_products):
     df = pd.DataFrame(raw_products)
+    cat_mappings = getCategoryMappings()
 
-    df["original_code"] = df["code"]
+    df['product_type'] = df['firstLevelCategory'].apply(lambda x: x['name'])
+    df['product_subtype_level1'] = df['url'].apply(lambda url: url.split('eshop/')[1].split('/')[1].split('/')[0])
+    df['product_subtype_level1'] = df['product_subtype_level1'].map(cat_mappings)
+    df['product_subtype_level2'] = df['url'].apply(lambda url: url.split('eshop/')[1].split('/')[2].split('/')[0])
+    df['product_subtype_level2'] = df['product_subtype_level2'].map(cat_mappings)
+
+    df["original_product_code"] = df["code"]
     df["brand"] = df["manufacturerName"]
-    df["supermarket"] = "ab"
+    df["supermarket_code"] = "ab"
 
     df["value"] = df["price"].apply(lambda x: x["value"])
     df["unit"] = df["price"].apply(lambda x: x["unit"])
@@ -37,27 +73,39 @@ def transform(raw_products):
         else np.nan
     )
 
-    df["url"] = "https://www.ab.gr" + df["url"]
-    df["image"] = df["images"].apply(
+    df["product_url"] = "https://www.ab.gr" + df["url"]
+    df["main_image"] = df["images"].apply(
         lambda imgs: "https://www.ab.gr" + imgs[0]["url"]
         if isinstance(imgs, list) and imgs else np.nan
     )
 
     df["privateLabel"] = df["brand"].isin(PRIVATE_LABELS)
     df['date'] = TODAY
+    df['product_id'] = df['supermarket_code'] + df['original_product_code']
+
+    df.rename(columns = {
+        "name":"product_name",
+        "product_type":"original_product_type_level1",
+        "product_subtype_level1":"original_product_type_level2",
+        "product_subtype_level2":"original_product_type_level3"
+        }, inplace=True)
 
     return df[
         [
-            "original_code",
+            'product_id',
+            "original_product_code",
             "brand",
-            "name",
+            "product_name",
             "value",
             "price_per_kilo",
             "unit",
-            "url",
-            "image",
-            "supermarket",
+            "product_url",
+            "main_image",
+            "supermarket_code",
             "privateLabel",
             "date",
+            "original_product_type_level1",
+            "original_product_type_level2",
+            "original_product_type_level3"
         ]
     ]

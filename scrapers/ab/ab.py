@@ -64,6 +64,7 @@ def fetch_products(category_code, page):
 
 
 def scrape():
+
     products = []
     categories = fetch_categories()
     for category_url in categories:
@@ -85,5 +86,6 @@ def scrape():
             products.extend(
                 data["data"]["categoryProductSearch"]["products"]
             )
+
 
     return products

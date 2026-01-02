@@ -4,3 +4,7 @@ requests
 beautifulsoup4
 datetime
 time
+sqlalchemy
+pyodbc
+os
+dotenv
