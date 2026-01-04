@@ -33,7 +33,7 @@ def main():
     from database.load_to_db import load_to_db
 
 
-    final_df = final_df.head(100)
+    # final_df = final_df.head(100)  <- for testing
     df_products, df_prices = prepareTables(final_df)
 
 
