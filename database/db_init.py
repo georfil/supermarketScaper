@@ -11,6 +11,7 @@ def initialiseDB():
     database = os.environ["DB_DATABASE"]
     username = os.environ["DB_USERNAME"]
     password = os.environ["DB_PASSWORD"]
+    cnxn = None
     try:
         cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password, timeout=20)
     except:
