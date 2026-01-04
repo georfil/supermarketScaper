@@ -11,9 +11,12 @@ def initialiseDB():
     database = os.environ["DB_DATABASE"]
     username = os.environ["DB_USERNAME"]
     password = os.environ["DB_PASSWORD"]
-    cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password)
-    cursor = cnxn.cursor()
-
-    cursor.fast_executemany = True  # key
-    print("Established Conenction with db")
-    return cursor, cnxn
+    try:
+        cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password, timeout=20)
+    except:
+        cnxn = pyodbc.connect('DRIVER={SQL Server};SERVER='+server+';DATABASE='+database+';UID='+username+';PWD='+ password, timeout=20)
+    finally:
+        cursor = cnxn.cursor()
+        cursor.fast_executemany = True  # key
+        print("Established Conenction with db")
+        return cursor, cnxn
