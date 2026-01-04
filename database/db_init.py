@@ -14,13 +14,10 @@ def initialiseDB(max_retries=6, base_delay=2):
     password = os.environ["DB_PASSWORD"]
 
     conn_str = (
-        "DRIVER={ODBC Driver 18 for SQL Server};"
         f"SERVER={server};"
         f"DATABASE={database};"
         f"UID={username};"
         f"PWD={password};"
-        "Encrypt=yes;"
-        "TrustServerCertificate=no;"
     )
 
     last_err = None
