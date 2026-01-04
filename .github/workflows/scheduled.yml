@@ -24,6 +24,19 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install Microsoft ODBC Driver 18 (msodbcsql18)
+        shell: bash
+        run: |
+          set -e
+          curl https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 unixodbc-dev
+        # This is the standard package-based install approach. [web:288]
+
+      - name: Verify ODBC drivers
+        run: python -c "import pyodbc; print('ODBC drivers:', pyodbc.drivers())"
+        # Helps confirm that "ODBC Driver 18 for SQL Server" is available. [web:245]
+
       - name: Run script
         env:
           DB_SERVER: ${{ secrets.DB_SERVER }}
