@@ -36,13 +36,14 @@ def main():
     # final_df = final_df.head(100)  <- for testing
     df_products, df_prices = prepareTables(final_df)
 
-
-    load_to_db(
-        {
-            "dbo.products":df_products,
-            "dbo.productPrices":df_prices
-        }
-    )
+    print(df_products.info())
+    print(df_prices.info())
+    # load_to_db(
+    #     {
+    #         "dbo.products":df_products,
+    #         "dbo.productPrices":df_prices
+    #     }
+    # )
 
 
 
