@@ -14,6 +14,7 @@ def removeExistingIDs(df):
 def executemany_batched(cursor, cnxn, sql, rows, batch_size=100, fastExecute = True):
     # rows: list[tuple] (or any sliceable sequence)
     cursor.fast_executemany = fastExecute
+    print(rows)
     for i in range(0, len(rows), batch_size):
         cursor.executemany(sql, rows[i:i+batch_size])
         cnxn.commit()
