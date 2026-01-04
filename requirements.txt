@@ -5,5 +5,4 @@ beautifulsoup4
 datetime
 sqlalchemy
 pyodbc
-os
 dotenv
