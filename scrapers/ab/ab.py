@@ -86,6 +86,7 @@ def scrape():
             products.extend(
                 data["data"]["categoryProductSearch"]["products"]
             )
+        break
 
 
     return products

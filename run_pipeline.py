@@ -38,12 +38,12 @@ def main():
 
     print(df_products.info())
     print(df_prices.info())
-    # load_to_db(
-    #     {
-    #         "dbo.products":df_products,
-    #         "dbo.productPrices":df_prices
-    #     }
-    # )
+    load_to_db(
+        {
+            "dbo.products":df_products,
+            "dbo.productPrices":df_prices
+        }
+    )
 
 
 
