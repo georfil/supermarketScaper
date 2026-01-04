@@ -14,6 +14,7 @@ def initialiseDB(max_retries=6, base_delay=2):
     password = os.environ["DB_PASSWORD"]
 
     conn_str = (
+        'DRIVER={SQL Server};'+
         f"SERVER={server};"
         f"DATABASE={database};"
         f"UID={username};"
