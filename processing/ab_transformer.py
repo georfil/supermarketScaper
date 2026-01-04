@@ -62,16 +62,17 @@ def transform(raw_products):
     df["brand"] = df["manufacturerName"]
     df["supermarket_code"] = "ab"
 
-    df["value"] = df["price"].apply(lambda x: x["value"])
-    df["unit"] = df["price"].apply(lambda x: x["unit"])
-
-    df["price_per_kilo"] = df["price"].apply(
+    df["pricePerKilo"] = df["price"].apply(
         lambda p: float(p["supplementaryPriceLabel1"]
                         .split("€/")[0]
                         .replace(",", "."))
         if p.get("supplementaryPriceLabel1") and "€/" in p["supplementaryPriceLabel1"]
         else np.nan
     )
+
+    df["unit"] = df["price"].apply(lambda x: x["unit"])
+    df["price"] = df["price"].apply(lambda x: x["value"])
+
 
     df["product_url"] = "https://www.ab.gr" + df["url"]
     df["main_image"] = df["images"].apply(
@@ -96,8 +97,8 @@ def transform(raw_products):
             "original_product_code",
             "brand",
             "product_name",
-            "value",
-            "price_per_kilo",
+            "price",
+            "pricePerKilo",
             "unit",
             "product_url",
             "main_image",

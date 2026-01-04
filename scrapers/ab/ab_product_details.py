@@ -43,6 +43,7 @@ def fetchproductDetails(code, session):
 def fetchParseDetailsResponse(code, response):
 
     mappings = {
+        'Ανά': 'portion',
         'Ενέργεια kj': 'energy_kj',
         'Ενέργεια kcal': 'energy_kcal',
         'Συνολικά λιπαρά': 'fat',
@@ -51,61 +52,43 @@ def fetchParseDetailsResponse(code, response):
         'Σάκχαρα': 'sugars',
         'Πρωτεΐνες': 'proteins',
         'Αλάτι': 'salt',
-        'Ανά': 'portion'
     }
     
-    blankOutput = {
-        **{'code':code,
-           'ingredients':None
-           },
-        **{v:None for v in mappings.values()},
-        **{'searchedNutri':True}
-        }
 
     try:
+
         data = response.json()
-        productImages = ["https://www.ab.gr/" + img.get('url', None) for img in data.get('data', None).get('productDetails', None).get('images', None) if img.get('format', None)=='zoom' and img.get('url', None)]
-        blankOutput = {
-            **blankOutput,
-            **{'productImages':productImages}
-        }
+        
+        # 1. Images of Product
+        try:
+            productImages = ["https://www.ab.gr/" + img.get('url', None) for img in data.get('data', None).get('productDetails', None).get('images', None) if img.get('format', None)=='zoom' and img.get('url', None)]
+        except:
+            productImages = []
 
         nutriData = data.get('data', None).get('productDetails', None).get('wsNutriFactData', None)
-        ingredients = nutriData.get('ingredients', None)
+        # 2. Ingredients of Product
+        ingredients = nutriData.get('ingredients', None) if nutriData else None
 
-        nutrients = nutriData.get('nutrients', None)
-        nutrients = nutrients[0]['nutrients'] if nutrients else None
+        # 3. Nutrients of Product (Per Portion)
+        try:
+            nutrients = nutriData.get('nutrients', None)
 
-        nutrients = {nutri['id']:nutri['valueList'][0]['value'] for nutri in nutrients if nutri.get('valueList', None) and len(nutri['valueList'])>0}
+            nutrients = nutrients[0]['nutrients'] if nutrients else None
+            total_nutrients_list = []
 
-        if nutrients:
-            output = {v: nutrients.get(k, None) for k, v in mappings.items()}
-            output['portion'] = output['portion'].split('<strong>')[1].split('</strong>')[0]
-            output = {
-                **{
-                    'code':code,
-                    'ingredients':ingredients
-                },
-                **output,
-                **{'searchedNutri':True},
-                 **{'productImages':productImages}
-            }
-            return output
-        else:
-            return blankOutput
-        
+            for i in range(0,len(nutrients[0]['valueList'])):
+                nutrient = {nutri['id']:nutri['valueList'][i]['value'] for nutri in nutrients if nutri.get('valueList', None) and len(nutri['valueList'])>0}
+                nutrientFormatted = {v: nutrient.get(k.replace(",", "."), None) for k, v in mappings.items()}
+                nutrientFormatted['portion'] = nutrientFormatted['portion'].split('<strong>')[1].split('</strong>')[0]
+                total_nutrients_list.append(nutrientFormatted)
+        except Exception as e:
+            total_nutrients_list = []
+
+        return {
+            "productImages": productImages,
+            "ingredients":ingredients,
+            "nutrients":total_nutrients_list
+        }
+
     except:
-        return blankOutput
-
-
-
-
-def run(df):
-
-    productDetails = []
-    for code in df['original_code']:
-        output = fetchproductDetails(code, requests.session())
-        productDetails.append(output)
-
-    df_ab_details = pd.DataFrame(productDetails)
-    return df_ab_details
+        return "error"
