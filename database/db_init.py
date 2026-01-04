@@ -9,8 +9,8 @@ load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 def initialiseDB(max_retries=6, base_delay=2):
     server = os.environ["DB_SERVER"]
-    database = os.environ["DB_NAME"]      # or DB_DATABASE, but keep consistent
-    username = os.environ["DB_USER"]      # or DB_USERNAME
+    database = os.environ["DB_DATABASE"]      # or DB_DATABASE, but keep consistent
+    username = os.environ["DB_USERNAME"]      # or DB_USERNAME
     password = os.environ["DB_PASSWORD"]
 
     conn_str = (
