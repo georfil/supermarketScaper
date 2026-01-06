@@ -91,6 +91,7 @@ def transform(raw_products):
         "product_subtype_level2":"original_product_type_level3"
         }, inplace=True)
 
+    df.drop_duplicates(subset="original_product_code", inplace=True)
     return df[
         [
             'product_id',

@@ -15,7 +15,8 @@ def prepareTables(df):
                       "product_url",
                       "main_image",
                       "privateLabel",
-                      "date"]].copy()
+                      "date",
+                      ]].copy()
     
     df_products.rename(columns = {"date":"created_at"}, inplace=True)
 
