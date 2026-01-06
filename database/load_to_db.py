@@ -1,7 +1,6 @@
 import pandas as pd
-from .db_init import initialiseDB
-from .db_loadElements import getIDS
-
+from db_init import initialiseDB
+# from .db_loadElements import getIDS
 
 
 def removeExistingIDs(df):
@@ -10,6 +9,9 @@ def removeExistingIDs(df):
     df_final = df_final[~df_final['product_id'].isin(existingIDs)]
     return df_final
 
-def load_to_db(tables: dict[str, pd.DataFrame]):
-    pass
+def load_to_db(tables: dict[str, pd.DataFrame]={}):
+    cursor, conn = initialiseDB()
+    print(conn)
 
+
+load_to_db()
