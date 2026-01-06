@@ -11,9 +11,6 @@ def getCategories():
     cnxn.close()
     return df
 
-
-
-
 def getSupermarkets():
     cursor, cnxn = initialiseDB()
     cursor.execute("SELECT * FROM dbo.supermarkets")
@@ -22,14 +19,6 @@ def getSupermarkets():
     df = pd.DataFrame.from_records(rows, columns=cols)
     cnxn.close()
     return df
-
-def getIDS():
-    cursor, cnxn = initialiseDB()
-    cursor.execute("SELECT product_id FROM dbo.products")
-    rows = cursor.fetchall()
-    cnxn.close()
-    return [id[0] for id in rows]
-
 
 def getIDSforDetailsSearch():
     cursor, cnxn = initialiseDB()

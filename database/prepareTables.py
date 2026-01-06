@@ -19,7 +19,7 @@ def prepareTables(df):
                       ]].copy()
     
     df_products.rename(columns = {"date":"created_at"}, inplace=True)
-
+    df_products["privateLabel"] = df_products["privateLabel"].astype(int)
 
     df_prices = df[['product_id',
                     'price',

@@ -9,21 +9,21 @@ load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 
 
-def _pick_driver():
+def pick_driver():
     available = pyodbc.drivers()
-    print(available)
     for d in ("ODBC Driver 18 for SQL Server", "ODBC Driver 17 for SQL Server", "SQL Server"):
         if d in available:
             return d
     raise RuntimeError(f"No SQL Server ODBC driver found. Available drivers: {available}")
 
-def initialiseDB(max_retries=3, base_delay=2):
+def initialiseDB(max_retries=3, base_delay=3):
     server = os.environ["DB_SERVER"]
     database = os.environ["DB_DATABASE"]
     username = os.environ["DB_USERNAME"]
     password = os.environ["DB_PASSWORD"]
 
-    driver = _pick_driver()
+    driver = pick_driver()
+    print(f"Picked Driver:{driver}")
 
     conn_str = (
         f"DRIVER={{{driver}}};"
@@ -33,18 +33,18 @@ def initialiseDB(max_retries=3, base_delay=2):
         f"PWD={password};"
     )
 
-    last_err = None
     for attempt in range(1, max_retries + 1):
         try:
-            cnxn = pyodbc.connect(conn_str, timeout=10)
+            print(f"Connecting to DB (attempt {attempt})...")
+            cnxn = pyodbc.connect(conn_str)
             cursor = cnxn.cursor()
             cursor.fast_executemany = True
-            print("Established connection with db")
+            print("✅ Database connection established")
             return cursor, cnxn
-        except pyodbc.Error as e:
-            last_err = e
-            if attempt == max_retries:
-                raise
-            sleep(base_delay * attempt)
 
-    raise last_err
+        except pyodbc.Error as e:
+            # First failure is expected when DB is paused
+            print("⏳ Database is waking up...")
+            if attempt == max_retries:
+                raise RuntimeError("DB did not wake up in time") from e
+            sleep(base_delay * attempt)

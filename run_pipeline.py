@@ -39,8 +39,8 @@ def main():
 
     load_to_db(
         {
-            "dbo.products":df_products,
-            # "dbo.productPrices":df_prices
+            "[staging].[products]":df_products,
+            "[dbo].[productPrices]":df_prices
         }
     )
 
